@@ -1,0 +1,9 @@
+{
+  "runtime": {
+    "port": 9510,
+    "bind": "127.0.0.1"
+  },
+  "website": {
+    "name": "Phix Website"
+  }
+}

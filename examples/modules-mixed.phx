@@ -1,0 +1,3 @@
+<?php
+require_once "lib/math.php";
+echo "Double: ", double(21), "\n";

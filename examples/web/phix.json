@@ -1,0 +1,11 @@
+{
+  "entry": "index.php",
+  "routing": {
+    "document_root": ".",
+    "deny": ["/storage/**", "/includes/**", "/classes/**", "/vendor/**"]
+  },
+  "storage": {
+    "uploads": "storage/uploads",
+    "max_file_size": 10485760
+  }
+}

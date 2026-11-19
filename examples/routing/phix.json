@@ -1,0 +1,14 @@
+{
+  "entry": "public/index.php",
+  "routing": {
+    "document_root": "public",
+    "deny": ["/includes/**", "/classes/**", "/vendor/**", "/storage/**"],
+    "rewrites": [
+      {"from": "/user/:id", "to": "/profile.php?id=:id"}
+    ],
+    "redirects": [
+      {"from": "/old", "to": "/new", "status": 301}
+    ],
+    "fallback": "/index.php"
+  }
+}

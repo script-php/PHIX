@@ -1,0 +1,2 @@
+<?php
+function double(int $n): int { return $n * 2; }
