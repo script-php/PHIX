@@ -867,3 +867,21 @@ This is an internal compiler facility, **not** yet the default parser codegen
 path. Existing `emit_rust` and expression adapters remain in use. Complete
 PHP compatibility, references, exception/finally precedence, and end-to-end
 PHP differential testing remain outstanding.
+
+### COMPAT-117 — Structural expression AST (compiler foundation)
+
+`phix/src/compiler/ast.rs` introduces a source-level expression tree and
+Pratt parser for nested calls, operators, PHP 8 ternaries, coalescing, array
+literals, indexing, property access, and assignments. Its four unit tests
+cover nested call composition, conditional/coalescing syntax, indexed array
+assignments, and rejection of ambiguous unparenthesized ternaries.
+
+**Implementation status:** AST construction is tested but is not yet connected
+to the legacy parser's executable code-generation path. In particular, this
+milestone does not remove `Default::default()` exception placeholders or
+establish complete PHP 8.x expression compatibility. The AST is not a full
+PHP grammar; additional expression constructs and semantic lowering remain.
+
+### COMPAT-118: structural expression semantic analysis
+
+The expression AST now exposes recursive `validate()` and `effects()` passes. Assignment targets are checked structurally, including nested indexed variables, property assignments and array append assignments. Effect summaries conservatively report potential exception propagation, calls and writes throughout nested expressions. These passes are currently tested AST facilities, **not yet integrated with executable Rust generation**. Existing parser-driven emission and pending-exception adapters remain; no claim of complete PHP expression compatibility is made.

@@ -140,12 +140,12 @@ PHP supports indexed and associative array literals, mutable elements, append, r
 - **PHP:** `===` compares arrays recursively, requiring the same key/value pairs in the same iteration order and identical value types. `!==` is its negation. Loose `==` and `!=` use different rules and ignore entry order.
 - **Phix now:** `===` and `!==` work for generated `Json::PhpArray` values and nested PHP arrays, including strict scalar comparisons within arrays. Verified by a compiled website test compared against installed PHP.
 - **Still different:** Loose array comparisons are not supported; PHP references, float literals and full warning/error semantics remain incomplete. PHP array comparisons against other PHP value types are not yet supported through source syntax. Internal JSON config arrays/objects are not treated as PHP arrays.
-- **Test:** `phix_rust/tests/array_strict_comparison.sh`.
+- **Test:** `phix/tests/array_strict_comparison.sh`.
 - **Status:** Partially resolved; retain until complete PHP comparison compatibility.
 
 ### COMPAT-018 — Loose array equality (partial resolution)
 
-PHP `==` and `!=` compare array entries by key without requiring matching insertion order, and compare corresponding values loosely. Phix now implements this behavior recursively for its PHP-source array representation, including common scalar conversions (`true`, `false`, `null`, numeric strings, integers, and floats). A compiled website differential test is in `phix_rust/tests/array_loose_comparison.sh`.
+PHP `==` and `!=` compare array entries by key without requiring matching insertion order, and compare corresponding values loosely. Phix now implements this behavior recursively for its PHP-source array representation, including common scalar conversions (`true`, `false`, `null`, numeric strings, integers, and floats). A compiled website differential test is in `phix/tests/array_loose_comparison.sh`.
 
 **Not yet parity-certified:** all PHP 8 numeric-string edge cases, warnings/errors for unusual comparisons, cyclic references, and reference semantics. PHP's broader scalar comparison rules are only approximated; avoid claiming complete array compatibility. The comparison does not change JSON configuration parsing.
 
@@ -376,14 +376,14 @@ PHP copying an array with a `self` element referring to the original array varia
 
 ### COMPAT-054 — Consolidated PHP array differential matrix
 
-- **Test:** `phix_rust/tests/array_differential_matrix.sh` compiles a PHP website with Phix, executes the same source under PHP CLI, and compares exact HTTP response bytes to PHP output.
+- **Test:** `phix/tests/array_differential_matrix.sh` compiles a PHP website with Phix, executes the same source under PHP CLI, and compares exact HTTP response bytes to PHP output.
 - **Verified:** 14 labeled cases covering equality, ordering, numeric strings, plain copies, reference-containing copies, and detached nested aliases. On this milestone all 14 matched PHP; `cargo test --offline` passed 102/102.
 - **Scope limitation:** This is a small curated matrix, not a representative measurement of PHP 8.x array compatibility. It does not cover warning/error formatting, recursion exceptions, full reference rebinding, key coercion edge cases, or the official PHP test corpus.
 - **Status:** Differential infrastructure added; full array compatibility not established.
 
 ### COMPAT-055 — Expanded PHP array differential matrix (verification only)
 
-- Expanded `phix_rust/tests/array_differential_matrix.sh` from 14 to 28 PHP CLI versus compiled-Phix HTTP output cases.
+- Expanded `phix/tests/array_differential_matrix.sh` from 14 to 28 PHP CLI versus compiled-Phix HTTP output cases.
 - Added negative-index append history, key coercion, duplicate keys, nested copying, detached aliases, reference rebinding, insertion-order equality, and numeric precision.
 - **Verified:** 28/28 cases matched PHP CLI in this environment; `cargo test --offline` passed 102/102.
 - **Not resolved:** this matrix does not establish full PHP array compatibility. Cyclic references, catchable PHP errors, warning parity, broader key conversion edge cases, and full PHP conformance remain open.
@@ -494,7 +494,7 @@ statement; catchable `TypeError`/`Error` remain unsupported.
 The current exception representation is still `Json::Object` with `class`, `message`,
 `code`, and `previous` keys. This is not a PHP object and does not preserve
 native identity or guarantee that a thrown value is an actual `Throwable`.
-The new `phix_rust/tests/exception_object_identity_regression.sh` is an
+The new `phix/tests/exception_object_identity_regression.sh` is an
 **expected-failing structural guard**. Do not count it as a passing test or
 as implemented compatibility. Completion requires a dedicated runtime object
 variant, identity-preserving catch/rethrow/previous, correct inheritance,
@@ -740,12 +740,12 @@ explicit executable outcomes. No PHP differential suite was run for this change.
 - **Status:** Partial (verified subset)
 - **PHP:** Catch clauses match subclasses through the exception inheritance hierarchy; `Error` is not an `Exception`.
 - **Phix:** Built-in SPL exception classes listed in `documentation.md` can be thrown and matched through their built-in parent classes. User-defined exception classes, other Throwable implementations, and complete control-flow unwinding remain unsupported.
-- **Verification:** `cargo test --offline` (266 passing); `phix_rust/tests/spl_exception_inheritance_parity.sh` matches installed PHP output for five compiled HTTP cases.
+- **Verification:** `cargo test --offline` (266 passing); `phix/tests/spl_exception_inheritance_parity.sh` matches installed PHP output for five compiled HTTP cases.
 
 ### COMPAT-100 — Exception constructor shorthand
 - **Status:** Verified subset.
 - `throw new RuntimeException;` and `throw new Exception()` are accepted both as statements and inside throw expressions, with built-in exception class restrictions unchanged.
-- Three new Rust regression tests pass (269 total). `phix_rust/tests/exception_constructor_shorthand_parity.sh` compares a compiled HTTP application's response with PHP for statement shorthand, expression shorthand, and parenthesized constructor arguments.
+- Three new Rust regression tests pass (269 total). `phix/tests/exception_constructor_shorthand_parity.sh` compares a compiled HTTP application's response with PHP for statement shorthand, expression shorthand, and parenthesized constructor arguments.
 - This does not implement user-defined exception subclasses, structured exception propagation, or return-in-finally semantics.
 
 ### COMPAT-101 — null coalescing (partial, 2026-11-19)
@@ -804,3 +804,19 @@ nested arithmetic, comparisons, boolean short-circuiting, ternaries and
 null-coalescing. **Not yet wired to the PHP parser's executable expression
 lowering**. The old sentinel-based paths remain; no additional PHP language
 feature is claimed compatible on the basis of this internal change.
+
+### COMPAT-117 — Expression AST architecture
+
+Added a structural expression parser (308 Rust tests passing, four new AST
+regressions). This is **not** an executable PHP compatibility claim: legacy
+parser/code generation remains active, exception sentinels remain, and PHP
+end-to-end differential tests were not run for this milestone. Next priority:
+connect AST to typed semantic IR and structured error propagation, with no
+syntax-specific forwarding shortcuts.
+
+### COMPAT-118 — AST semantic analysis (internal)
+
+- Added structural assignment-target validation and recursive expression effect summaries.
+- Verified with Rust unit tests, including nested calls and invalid assignment targets.
+- **Not yet connected to executable expression lowering**; no new end-to-end PHP compatibility claim.
+- Pending: AST-to-typed-IR integration, explicit exception outcomes in generated expressions, full PHP differential testing.

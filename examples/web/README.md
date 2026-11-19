@@ -1,6 +1,6 @@
 # Phix web example — HTTP, config and persistent uploads
 
-Build from the `phix_rust` directory:
+Build from the `phix` directory:
 
 ```sh
 cargo build --release
@@ -26,4 +26,4 @@ Existing upload files are also preserved on rebuild. The upload directory is
 not published as static content. Its initial README file is copied only on first
 deployment. Removing `storage.uploads` disables uploads.
 
-Run `bash tests/web_example_upload.sh` from `phix_rust/` for an end-to-end test.
+Run `bash tests/web_example_upload.sh` from `phix/` for an end-to-end test.

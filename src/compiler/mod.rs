@@ -1,3 +1,4 @@
+mod ast;
 mod flow;
 mod ir;
 mod types;
